@@ -32,12 +32,13 @@ async function captureAndCheck() {
 
   if (policeProb > nonPoliceProb && policeProb > 0.7) {
     document.getElementById("result").innerText = "✅ Police Uniform Detected";
-    window.location.href = "https://yoursharepointlink"; // 🔗 Police folder open
+    window.location.href = "https://messengersworld.sharepoint.com/:f:/s/POSTSAU2/EmBJ9Sw9dANAg_uWKjfMnJUB0_BGPcz6LENAMYODw-f1fQ"; // 🔗 Police folder open
   } else {
     document.getElementById("result").innerText = "❌ Not a Police Uniform";
   }
 }
 
 loadModel();
+
 
 
