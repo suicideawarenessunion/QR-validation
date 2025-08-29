@@ -1,45 +1,82 @@
-let model, webcam;
+// ======= CONFIG – update these two as per your model =======
+const SHAREPOINT_LINK = "https://yourtenant.sharepoint.com/sites/YourSite/Shared%20Documents/YourFolder";
+// If your Teachable Machine labels are ["Police","NonPolice"], keep POLICE_INDEX=0.
+// If it is ["NonPolice","Police"], set POLICE_INDEX=1.
+const POLICE_INDEX = 0;          // <-- check metadata.json -> "labels"
+const THRESHOLD = 0.70;          // 70% confidence
+const CHECK_EVERY_MS = 800;      // how often to predict (ms)
+// ===========================================================
 
-async function loadModel() {
-  model = await tf.loadLayersModel("model/model.json");
-  console.log("✅ Model loaded");
-  setupCamera();
-}
+let model;
+let redirected = false;
+const statusEl = () => document.getElementById("status");
+const resultEl  = () => document.getElementById("result");
 
-async function setupCamera() {
-  const webcamElement = document.getElementById("webcam");
-  webcam = await navigator.mediaDevices.getUserMedia({ video: true });
-  webcamElement.srcObject = webcam;
-}
+window.onload = () => init();
 
-async function captureAndCheck() {
-  const video = document.getElementById("webcam");
-  const canvas = document.createElement("canvas");
-  canvas.width = 224;
-  canvas.height = 224;
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(video, 0, 0, 224, 224);
-
-  // convert image to tensor
-  let img = tf.browser.fromPixels(canvas).toFloat().expandDims(0);
-
-  // predict
-  const prediction = await model.predict(img).data();
-  console.log("Prediction:", prediction);
-
-  const policeProb = prediction[0];  // Class 1 probability (police)
-  const nonPoliceProb = prediction[1]; // Class 2 probability (non-police)
-
-  if (policeProb > nonPoliceProb && policeProb > 0.7) {
-    document.getElementById("result").innerText = "✅ Accepted";
-    window.location.href = "https://messengersworld.sharepoint.com/:f:/s/POSTSAU2/EmBJ9Sw9dANAg_uWKjfMnJUB0_BGPcz6LENAMYODw-f1fQ"; // 🔗 Police folder open
-  } else {
-    document.getElementById("result").innerText = "❌ Rejected";
+async function init() {
+  try {
+    statusEl().textContent = "Loading model…";
+    model = await tf.loadLayersModel("model/model.json");
+    statusEl().textContent = "Starting camera…";
+    await setupCamera();
+    statusEl().textContent = "Checking automatically…";
+    startAutoLoop();
+  } catch (e) {
+    console.error(e);
+    statusEl().textContent = "Error: " + e.message;
   }
 }
 
-loadModel();
+async function setupCamera() {
+  const video = document.getElementById("webcam");
+  const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+  video.srcObject = stream;
+  await video.play();
+}
 
+function startAutoLoop() {
+  // predict repeatedly without any button
+  setInterval(async () => {
+    if (redirected) return;
+    await predictOneFrame();
+  }, CHECK_EVERY_MS);
+}
 
+async function predictOneFrame() {
+  const video = document.getElementById("webcam");
 
+  // draw current frame to an offscreen canvas & make tensor
+  const canvas = document.createElement("canvas");
+  canvas.width = 224; canvas.height = 224;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
+  let img = tf.browser.fromPixels(canvas).toFloat().expandDims(0);
+
+  // run prediction
+  const out = await model.predict(img).data();
+  // out can be [p] (sigmoid) or [p0, p1] (softmax). Handle both:
+  let policeProb, nonPoliceProb;
+
+  if (out.length === 1) {
+    // sigmoid = probability of class "Police" (assume)
+    policeProb = out[0];
+    nonPoliceProb = 1 - policeProb;
+  } else {
+    policeProb = out[POLICE_INDEX];
+    nonPoliceProb = out[1 - POLICE_INDEX];
+  }
+
+  const pct = (n) => Math.round(n * 100);
+  resultEl().textContent = `Police: ${pct(policeProb)}%  |  NonPolice: ${pct(nonPoliceProb)}%`;
+
+  if (policeProb >= THRESHOLD && !redirected) {
+    redirected = true;
+    statusEl().textContent = "✅ Accepted";
+    // little delay so user sees the message
+    setTimeout(() => window.location.href = SHAREPOINT_LINK, 400);
+  } else if (!redirected) {
+    statusEl().textContent = "❌ Rejected";
+  }
+}
