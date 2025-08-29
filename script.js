@@ -82,7 +82,7 @@ async function predictOneFrame() {
     if (acceptCounter >= 5 && !redirected) {  // 👈 5 continuous frames
       redirected = true;
       resultEl().textContent = "✅ Accepted"; 
-      setTimeout(() => window.location.href = SHAREPOINT_LINK, 400);
+      setTimeout(() => window.location.href = "https://messengersworld.sharepoint.com/:f:/s/POSTSAU2/EmBJ9Sw9dANAg_uWKjfMnJUB0_BGPcz6LENAMYODw-f1fQ", 400);
     }
   } else {
     acceptCounter = 0;
@@ -92,5 +92,6 @@ async function predictOneFrame() {
   }
 }
 }
+
 
 
