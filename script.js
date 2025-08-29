@@ -75,10 +75,11 @@ async function predictOneFrame() {
   redirected = true;
   statusEl().textContent = "✅ Accepted";
   resultEl().textContent = "✅ Accepted";   // only text, no % 
-  setTimeout(() => window.location.href = SHAREPOINT_LINK, 400);
+  setTimeout(() => window.location.href = https://messengersworld.sharepoint.com/:f:/s/POSTSAU2/EmBJ9Sw9dANAg_uWKjfMnJUB38Edjlk0qL2d8sJcsHkZkg?e=lkQ22T, 400);
   } else if (!redirected) {
   statusEl().textContent = "❌ Rejected";
   resultEl().textContent = "❌ Rejected";   // only text, no % 
   }
 }
+
 
