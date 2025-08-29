@@ -31,14 +31,15 @@ async function captureAndCheck() {
   const nonPoliceProb = prediction[1]; // Class 2 probability (non-police)
 
   if (policeProb > nonPoliceProb && policeProb > 0.7) {
-    document.getElementById("result").innerText = "✅ Police Uniform Detected";
+    document.getElementById("result").innerText = "✅ Accepted";
     window.location.href = "https://messengersworld.sharepoint.com/:f:/s/POSTSAU2/EmBJ9Sw9dANAg_uWKjfMnJUB0_BGPcz6LENAMYODw-f1fQ"; // 🔗 Police folder open
   } else {
-    document.getElementById("result").innerText = "❌ Not a Police Uniform";
+    document.getElementById("result").innerText = "❌ Rejected";
   }
 }
 
 loadModel();
+
 
 
 
