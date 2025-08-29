@@ -1,7 +1,7 @@
 let model, webcam;
 
 async function loadModel() {
-  model = await tf.loadLayersModel("model/model.json");
+  model = await tf.loadLayersModel("model.json");
   console.log("✅ Model loaded");
   setupCamera();
 }
@@ -39,3 +39,4 @@ async function captureAndCheck() {
 }
 
 loadModel();
+
