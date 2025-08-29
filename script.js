@@ -3,9 +3,9 @@ const SHAREPOINT_LINK = "https://yourtenant.sharepoint.com/sites/YourSite/Shared
 // metadata.json లో labels: ["Class 1","Class 2"] ఉన్నాయ్
 // Class 1 = Police, Class 2 = NonPolice కాబట్టి
 const POLICE_INDEX = 0;          
-const LABELS = ["Police", "NonPolice"];   // <-- added
-const THRESHOLD = 0.70;          // 70% confidence
-const CHECK_EVERY_MS = 800;      // how often to predict (ms)
+const LABELS = ["Police", "NonPolice"]; 
+const THRESHOLD = 0.50;        
+const CHECK_EVERY_MS = 800;     
 // ===========================================================
 
 let model;
@@ -53,7 +53,7 @@ async function predictOneFrame() {
   const ctx = canvas.getContext("2d");
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  let img = tf.browser.fromPixels(canvas).toFloat().expandDims(0);
+  let img = tf.browser.fromPixels(canvas).toFloat().div(255.0).expandDims(0);
 
   // run prediction
   const out = await model.predict(img).data();
@@ -83,3 +83,4 @@ async function predictOneFrame() {
     resultEl().textContent = "❌ Rejected";   // only text, no %
   }
 }
+
