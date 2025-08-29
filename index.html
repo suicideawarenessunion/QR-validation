@@ -1,13 +1,25 @@
-<!DOCTYPE html> 
-<html> 
-<head> 
-<title>Police Uniform Detection</title> 
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script> 
-<script src="script.js" defer></script> </head> 
-<body> 
-<h2>Scan & Check</h2> <!-- Camera preview --> 
-<video id="webcam" autoplay playsinline width="300" height="300"></video> 
-<button onclick="captureAndCheck()">Check Police Uniform</button> <!-- Result --> 
-<p id="result"></p> 
-</body> 
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Police Uniform Detection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+  <script src="script.js" defer></script>
+  <style>
+    body{font-family:system-ui,Segoe UI,Arial;margin:24px}
+    #wrap{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+    #status{margin-top:8px;font-weight:600}
+  </style>
+</head>
+<body>
+  <h2>Scan & Check</h2>
+  <div id="wrap">
+    <video id="webcam" autoplay playsinline width="320" height="240"></video>
+    <div>
+      <div id="status">Initializing…</div>
+      <div id="result"></div>
+    </div>
+  </div>
+</body>
 </html>
