@@ -3,16 +3,63 @@
 <head>
   <title>Police Uniform Detection</title>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
-  <script src="script.js" defer></script>
+  <script>
+    let model;
+    let webcam;
+
+    async function init() {
+      // Load model
+      model = await tf.loadLayersModel("model/model.json");
+
+      // Access webcam
+      webcam = document.getElementById("webcam");
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          webcam.srcObject = stream;
+        });
+
+      // Start prediction loop
+      predictLoop();
+    }
+
+    async function predictLoop() {
+      if (model && webcam.readyState === 4) {
+        // Draw current frame to canvas
+        const canvas = document.createElement("canvas");
+        canvas.width = 224; // input size
+        canvas.height = 224;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(webcam, 0, 0, 224, 224);
+
+        // Convert to tensor
+        let imgTensor = tf.browser.fromPixels(canvas)
+          .toFloat()
+          .div(tf.scalar(255))
+          .expandDims(0);
+
+        // Prediction
+        let prediction = model.predict(imgTensor);
+        let result = await prediction.data();
+        
+        // Suppose index 0 = Non-Police, index 1 = Police
+        if (result[1] > 0.8) {
+          document.getElementById("result").innerText = "✅ Police Uniform Detected! Opening link...";
+          window.location.href = "https://your-link-here.com"; // redirect
+        } else {
+          document.getElementById("result").innerText = "❌ No Police Uniform";
+        }
+      }
+
+      // Repeat every 1 second
+      setTimeout(predictLoop, 1000);
+    }
+
+    window.onload = init;
+  </script>
 </head>
 <body>
-  <h2>Scan & Check</h2>
-
-  <!-- Camera preview -->
+  <h2>Auto Police Uniform Detection</h2>
   <video id="webcam" autoplay playsinline width="300" height="300"></video>
-  <button onclick="captureAndCheck()">Check Police Uniform</button>
-
-  <!-- Result -->
-  <p id="result"></p>
+  <p id="result">Checking...</p>
 </body>
 </html>
