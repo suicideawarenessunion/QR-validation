@@ -73,14 +73,24 @@ async function predictOneFrame() {
   // 🔹 Instead of hardcoding, use LABELS array
   resultEl().textContent = `${LABELS[0]}: ${pct(policeProb)}%  |  ${LABELS[1]}: ${pct(nonPoliceProb)}%`;
 
-  if (policeProb >= THRESHOLD && !redirected) {
-    redirected = true;
-    statusEl().textContent = "✅ Accepted";
-    resultEl().textContent = "✅ Accepted";   // only text, no %
-    setTimeout(() => window.location.href = "https://messengersworld.sharepoint.com/:f:/s/POSTSAU2/EmBJ9Sw9dANAg_uWKjfMnJUB38Edjlk0qL2d8sJcsHkZkg?e=lkQ22T", 400);
-  } else if (!redirected) {
-    statusEl().textContent = "❌ Rejected";
-    resultEl().textContent = "❌ Rejected";   // only text, no %
+  let acceptCounter = 0;
+
+async function predictOneFrame() {
+  ...
+  if (policeProb >= THRESHOLD) {
+    acceptCounter++;
+    if (acceptCounter >= 5 && !redirected) {  // 👈 5 continuous frames
+      redirected = true;
+      resultEl().textContent = "✅ Accepted"; 
+      setTimeout(() => window.location.href = SHAREPOINT_LINK, 400);
+    }
+  } else {
+    acceptCounter = 0;
+    if (!redirected) {
+      resultEl().textContent = "❌ Rejected";
+    }
   }
 }
+}
+
 
