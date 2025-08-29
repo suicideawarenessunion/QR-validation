@@ -72,11 +72,13 @@ async function predictOneFrame() {
   resultEl().textContent = `Police: ${pct(policeProb)}%  |  NonPolice: ${pct(nonPoliceProb)}%`;
 
   if (policeProb >= THRESHOLD && !redirected) {
-    redirected = true;
-    statusEl().textContent = "✅ Accepted";
-    // little delay so user sees the message
-    setTimeout(() => window.location.href = SHAREPOINT_LINK, 400);
+  redirected = true;
+  statusEl().textContent = "✅ Accepted";
+  resultEl().textContent = "✅ Accepted";   // only text, no % 
+  setTimeout(() => window.location.href = SHAREPOINT_LINK, 400);
   } else if (!redirected) {
-    statusEl().textContent = "❌ Rejected";
+  statusEl().textContent = "❌ Rejected";
+  resultEl().textContent = "❌ Rejected";   // only text, no % 
   }
 }
+
