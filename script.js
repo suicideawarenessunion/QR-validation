@@ -1,8 +1,9 @@
 // ======= CONFIG – update these two as per your model =======
 const SHAREPOINT_LINK = "https://yourtenant.sharepoint.com/sites/YourSite/Shared%20Documents/YourFolder";
-// If your Teachable Machine labels are ["Police","NonPolice"], keep POLICE_INDEX=0.
-// If it is ["NonPolice","Police"], set POLICE_INDEX=1.
-const POLICE_INDEX = 0;          // <-- check metadata.json -> "labels"
+// metadata.json లో labels: ["Class 1","Class 2"] ఉన్నాయ్
+// Class 1 = Police, Class 2 = NonPolice కాబట్టి
+const POLICE_INDEX = 0;          
+const LABELS = ["Police", "NonPolice"];   // <-- added
 const THRESHOLD = 0.70;          // 70% confidence
 const CHECK_EVERY_MS = 800;      // how often to predict (ms)
 // ===========================================================
@@ -60,7 +61,6 @@ async function predictOneFrame() {
   let policeProb, nonPoliceProb;
 
   if (out.length === 1) {
-    // sigmoid = probability of class "Police" (assume)
     policeProb = out[0];
     nonPoliceProb = 1 - policeProb;
   } else {
@@ -69,18 +69,17 @@ async function predictOneFrame() {
   }
 
   const pct = (n) => Math.round(n * 100);
-  resultEl().textContent = `Police: ${pct(policeProb)}%  |  NonPolice: ${pct(nonPoliceProb)}%`;
+
+  // 🔹 Instead of hardcoding, use LABELS array
+  resultEl().textContent = `${LABELS[0]}: ${pct(policeProb)}%  |  ${LABELS[1]}: ${pct(nonPoliceProb)}%`;
 
   if (policeProb >= THRESHOLD && !redirected) {
-  redirected = true;
-  statusEl().textContent = "✅ Accepted";
-  resultEl().textContent = "✅ Accepted";   // only text, no % 
-  setTimeout(() => window.location.href = "https://messengersworld.sharepoint.com/:f:/s/POSTSAU2/EmBJ9Sw9dANAg_uWKjfMnJUB38Edjlk0qL2d8sJcsHkZkg?e=lkQ22T", 400);
+    redirected = true;
+    statusEl().textContent = "✅ Accepted";
+    resultEl().textContent = "✅ Accepted";   // only text, no %
+    setTimeout(() => window.location.href = "https://messengersworld.sharepoint.com/:f:/s/POSTSAU2/EmBJ9Sw9dANAg_uWKjfMnJUB38Edjlk0qL2d8sJcsHkZkg?e=lkQ22T", 400);
   } else if (!redirected) {
-  statusEl().textContent = "❌ Rejected";
-  resultEl().textContent = "❌ Rejected";   // only text, no % 
+    statusEl().textContent = "❌ Rejected";
+    resultEl().textContent = "❌ Rejected";   // only text, no %
   }
 }
-
-
-
